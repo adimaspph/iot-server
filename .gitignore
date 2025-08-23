@@ -1,0 +1,24 @@
+# Binaries
+/bin
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build cache
+*.out
+*.test
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Docker
+db_data/
+
+# Environment
+.env
