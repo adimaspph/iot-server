@@ -89,7 +89,7 @@ func (c *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 		ID1:        sensor.ID1,
 		ID2:        sensor.ID2,
 		SensorType: sensor.SensorType,
-		Sensors: []model.Sensor{
+		SensorsRecords: []model.SensorRecord{
 			{
 				SensorValue: record.SensorValue,
 				Timestamp:   record.Timestamp,
