@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"iot-subscriber/internal/entity"
+	"iot-subscriber/internal/model"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -30,4 +31,48 @@ func (r *SensorRepository) FindByUnique(tx *gorm.DB, id1 string, id2 int64, sens
 		return nil, err
 	}
 	return &sensor, nil
+}
+
+func (r *SensorRepository) FindSensorRecordsByIdCombination(
+	tx *gorm.DB,
+	id1 string,
+	id2 int64,
+	page, pageSize int,
+) (*entity.Sensor, *model.PageMetadata, error) {
+	var sensor *entity.Sensor
+
+	offset := (page - 1) * pageSize
+
+	// load sensors and apply pagination for sensor records
+	err := tx.Model(&entity.Sensor{}).
+		Where("id1 = ? AND id2 = ?", id1, id2).
+		Preload("Records", func(db *gorm.DB) *gorm.DB {
+			return db.Order("timestamp ASC").
+				Limit(pageSize).
+				Offset(offset)
+		}).
+		Find(&sensor).Error
+	if err != nil {
+		r.Log.WithError(err).Error("failed to load sensor record with paginated records")
+		return nil, nil, err
+	}
+
+	// count total record
+	var totalItem int64
+	err = tx.Model(&entity.SensorRecord{}).
+		Where("sensor_id = ?", sensor.SensorID).
+		Count(&totalItem).Error
+	if err != nil {
+		r.Log.WithError(err).Error("failed to count record with paginated records")
+		return nil, nil, err
+	}
+
+	metadata := &model.PageMetadata{
+		Page:      page,
+		Size:      pageSize,
+		TotalItem: totalItem,
+		TotalPage: int64(int((totalItem + int64(pageSize) - 1) / int64(pageSize))),
+	}
+
+	return sensor, metadata, nil
 }
