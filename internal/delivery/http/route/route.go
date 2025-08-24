@@ -21,4 +21,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 
 	sensor := v1.Group("/sensor")
 	sensor.POST("/create", c.SensorController.CreateSensor)
+	sensor.GET("/search", c.SensorController.SearchByCombinedId)
 }
