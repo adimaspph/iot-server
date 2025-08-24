@@ -4,6 +4,7 @@ import (
 	"errors"
 	"iot-subscriber/internal/entity"
 	"iot-subscriber/internal/model"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -77,4 +78,46 @@ func (r *SensorRepository) FindSensorRecordsByIdCombination(
 	}
 
 	return sensor, metadata, nil
+}
+
+func (r *SensorRepository) FindSensorRecordsByTimeRange(
+	tx *gorm.DB,
+	startTime, endTime time.Time,
+	page, pageSize int,
+) ([]entity.SensorRecord, *model.PageMetadata, error) {
+	var sensors []entity.SensorRecord
+
+	offset := (page - 1) * pageSize
+
+	// count total record
+	var totalItems int64
+	err := tx.Model(&entity.SensorRecord{}).
+		Where("timestamp BETWEEN ? AND ?", startTime, endTime).
+		Count(&totalItems).Error
+	if err != nil {
+		r.Log.WithError(err).Error("failed to count sensors by time range")
+		return nil, nil, err
+	}
+
+	// find sensor record by time range
+	err = tx.Model(&entity.SensorRecord{}).
+		Where("timestamp BETWEEN ? AND ?", startTime, endTime).
+		Preload("Sensor").
+		Order("timestamp ASC").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&sensors).Error
+	if err != nil {
+		r.Log.WithError(err).Errorf("failed to retrieve sensors with records by time range: %v", err)
+		return nil, nil, err
+	}
+
+	metadata := &model.PageMetadata{
+		Page:      page,
+		Size:      pageSize,
+		TotalItem: totalItems,
+		TotalPage: int64(int((totalItems + int64(pageSize) - 1) / int64(pageSize))),
+	}
+
+	return sensors, metadata, nil
 }
