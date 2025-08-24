@@ -2,16 +2,16 @@ package model
 
 import "time"
 
-type Sensor struct {
+type SensorRecord struct {
 	SensorValue float64   `json:"sensor_value"`
 	Timestamp   time.Time `json:"timestamp"`
 }
 
 type SensorResponse struct {
-	ID1        string   `json:"id1"`
-	ID2        int64    `json:"id2"`
-	SensorType string   `json:"sensor_type"`
-	Sensors    []Sensor `json:"sensors"`
+	ID1            string         `json:"id1"`
+	ID2            int64          `json:"id2"`
+	SensorType     string         `json:"sensor_type"`
+	SensorsRecords []SensorRecord `json:"sensor_records"`
 }
 
 type CreateSensorRequest struct {
