@@ -26,7 +26,7 @@ func (c SensorController) CreateSensor(ctx echo.Context) error {
 
 	err := ctx.Bind(&request)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to create sensor record")
+		c.Log.WithError(err).Error("failed to bind request")
 		return err
 	}
 
@@ -40,5 +40,30 @@ func (c SensorController) CreateSensor(ctx echo.Context) error {
 }
 
 func (c SensorController) SearchByCombinedId(ctx echo.Context) error {
-	return nil
+	var request model.SensorSearchByIdRequest
+
+	err := ctx.Bind(&request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to bind request")
+		return err
+	}
+
+	// Defaults value
+	if request.Page == 0 {
+		request.Page = 1
+	}
+	if request.PageSize == 0 {
+		request.PageSize = 20
+	}
+
+	response, metadata, err := c.UseCase.SearchByIdCombination(ctx.Request().Context(), &request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to search sensor record")
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, model.WebResponse[*model.SensorResponse]{
+		Data:   response,
+		Paging: metadata,
+	})
 }
