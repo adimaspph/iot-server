@@ -28,3 +28,10 @@ type SensorSearchByIdRequest struct {
 	Page     int    `query:"page" validate:"omitempty,min=1"`             // optional, must be >= 1 if provided
 	PageSize int    `query:"pageSize" validate:"omitempty,min=1,max=100"` // optional, must be between 1–100
 }
+
+type SensorSearchByTimeRangeRequest struct {
+	Start    time.Time `query:"start" validate:"required"`
+	End      time.Time `query:"end" validate:"required"`
+	Page     int       `query:"page" validate:"omitempty,min=1"`             // optional, must be >= 1 if provided
+	PageSize int       `query:"pageSize" validate:"omitempty,min=1,max=100"` // optional, must be between 1–100
+}
