@@ -21,3 +21,10 @@ type CreateSensorRequest struct {
 	SensorValue float64 `json:"sensor_value" validate:"required"`
 	Timestamp   string  `json:"timestamp" validate:"required,datetime=2006-01-02T15:04:05.000Z"`
 }
+
+type SensorSearchByIdRequest struct {
+	ID1      string `query:"id1" validate:"required,uppercase"`
+	ID2      int64  `query:"id2" validate:"required"`
+	Page     int    `query:"page" validate:"omitempty,min=1"`             // optional, must be >= 1 if provided
+	PageSize int    `query:"pageSize" validate:"omitempty,min=1,max=100"` // optional, must be between 1–100
+}
