@@ -44,14 +44,16 @@ func (r *SensorRepository) FindSensorRecordsByIdCombination(
 	offset := (page - 1) * pageSize
 
 	// load sensors and apply pagination for sensor records
-	err := tx.Model(&entity.Sensor{}).
+	err := tx.
 		Where("id1 = ? AND id2 = ?", id1, id2).
+		Order("sensor_id ASC").
 		Preload("Records", func(db *gorm.DB) *gorm.DB {
-			return db.Order("timestamp ASC").
+			return db.
+				Order("timestamp ASC").
 				Limit(pageSize).
 				Offset(offset)
 		}).
-		Find(&sensor).Error
+		First(&sensor).Error
 	if err != nil {
 		r.Log.WithError(err).Error("failed to load sensor record with paginated records")
 		return nil, nil, err
