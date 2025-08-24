@@ -154,7 +154,7 @@ func (u SensorUsecase) SearchByTimeRange(ctx context.Context, request *model.Sen
 	}
 
 	// Build response
-	resp := converter.SensorRecordsToResponsesFrom(sensors)
+	resp := converter.SensorRecordsToResponse(sensors)
 
 	return resp, metadata, nil
 }
