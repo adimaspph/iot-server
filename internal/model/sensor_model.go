@@ -44,3 +44,7 @@ type SensorSearchByIdAndTimeRangeRequest struct {
 	Page     int       `query:"page" validate:"omitempty,min=1"`             // optional, must be >= 1 if provided
 	PageSize int       `query:"pageSize" validate:"omitempty,min=1,max=100"` // optional, must be between 1–100
 }
+
+type SensorDeleteResponse struct {
+	Deleted int64 `json:"deleted"`
+}
