@@ -121,3 +121,52 @@ func (r *SensorRepository) FindSensorRecordsByTimeRange(
 
 	return sensors, metadata, nil
 }
+
+func (r *SensorRepository) FindSensorRecordsByIdAndTimeRange(
+	tx *gorm.DB,
+	id1 string,
+	id2 int64,
+	startTime, endTime time.Time,
+	page, pageSize int,
+) (*entity.Sensor, *model.PageMetadata, error) {
+	var sensor *entity.Sensor
+
+	offset := (page - 1) * pageSize
+
+	// load sensors and apply pagination for sensor records
+	err := tx.
+		Where("id1 = ? AND id2 = ?", id1, id2).
+		Order("sensor_id ASC").
+		Preload("Records", func(db *gorm.DB) *gorm.DB {
+			return db.
+				Where("timestamp BETWEEN ? AND ?", startTime, endTime).
+				Order("timestamp ASC").
+				Limit(pageSize).
+				Offset(offset)
+		}).
+		First(&sensor).Error
+	if err != nil {
+		r.Log.WithError(err).Error("failed to load sensor record with paginated records")
+		return nil, nil, err
+	}
+
+	// count total record
+	var totalItem int64
+	err = tx.Model(&entity.SensorRecord{}).
+		Where("sensor_id = ?", sensor.SensorID).
+		Where("timestamp BETWEEN ? AND ?", startTime, endTime).
+		Count(&totalItem).Error
+	if err != nil {
+		r.Log.WithError(err).Error("failed to count record with paginated records")
+		return nil, nil, err
+	}
+
+	metadata := &model.PageMetadata{
+		Page:      page,
+		Size:      pageSize,
+		TotalItem: totalItem,
+		TotalPage: int64(int((totalItem + int64(pageSize) - 1) / int64(pageSize))),
+	}
+
+	return sensor, metadata, nil
+}
