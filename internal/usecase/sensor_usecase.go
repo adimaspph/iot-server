@@ -158,3 +158,32 @@ func (u SensorUsecase) SearchByTimeRange(ctx context.Context, request *model.Sen
 
 	return resp, metadata, nil
 }
+
+func (c SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, request *model.SensorSearchByIdAndTimeRangeRequest) (*model.SensorResponse, *model.PageMetadata, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	// validate request
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.WithError(err).Error("failed to validate request body")
+		return nil, nil, echo.ErrBadRequest
+	}
+
+	sensor, metadata, err := c.SensorRepository.FindSensorRecordsByIdAndTimeRange(tx, request.ID1, request.ID2, request.Start, request.End, request.Page, request.PageSize)
+
+	if err != nil {
+		c.Log.WithError(err).Error("error getting sensor records")
+		return nil, nil, echo.ErrNotFound
+	}
+
+	// Commit transaction
+	if err := tx.Commit().Error; err != nil {
+		c.Log.WithError(err).Error("failed to commit transaction")
+		return nil, nil, echo.ErrInternalServerError
+	}
+
+	// Build response
+	resp := converter.SensorToResponse(sensor)
+
+	return resp, metadata, nil
+}
