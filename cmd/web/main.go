@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"iot-subscriber/internal/config"
+	"iot-server/internal/config"
 )
 
 func main() {

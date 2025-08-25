@@ -1,8 +1,8 @@
 package http
 
 import (
-	"iot-subscriber/internal/model"
-	"iot-subscriber/internal/usecase"
+	"iot-server/internal/model"
+	"iot-server/internal/usecase"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

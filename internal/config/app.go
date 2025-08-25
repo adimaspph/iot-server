@@ -2,10 +2,10 @@ package config
 
 import (
 	"database/sql"
-	"iot-subscriber/internal/delivery/http"
-	"iot-subscriber/internal/delivery/http/route"
-	"iot-subscriber/internal/repository"
-	"iot-subscriber/internal/usecase"
+	"iot-server/internal/delivery/http"
+	"iot-server/internal/delivery/http/route"
+	"iot-server/internal/repository"
+	"iot-server/internal/usecase"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"

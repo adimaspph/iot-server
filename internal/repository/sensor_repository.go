@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"iot-subscriber/internal/entity"
-	"iot-subscriber/internal/model"
+	"iot-server/internal/entity"
+	"iot-server/internal/model"
 	"time"
 
 	"github.com/sirupsen/logrus"

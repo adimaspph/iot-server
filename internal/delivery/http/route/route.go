@@ -1,7 +1,7 @@
 package route
 
 import (
-	"iot-subscriber/internal/delivery/http"
+	"iot-server/internal/delivery/http"
 
 	"github.com/labstack/echo/v4"
 )

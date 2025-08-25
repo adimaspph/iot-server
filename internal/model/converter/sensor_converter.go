@@ -2,8 +2,8 @@ package converter
 
 import (
 	"fmt"
-	"iot-subscriber/internal/entity"
-	"iot-subscriber/internal/model"
+	"iot-server/internal/entity"
+	"iot-server/internal/model"
 )
 
 func SensorToResponse(sensor *entity.Sensor) *model.SensorResponse {

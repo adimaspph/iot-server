@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"iot-subscriber/internal/entity"
+	"iot-server/internal/entity"
 
 	"github.com/sirupsen/logrus"
 )
