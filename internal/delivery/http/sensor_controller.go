@@ -165,3 +165,23 @@ func (c SensorController) DeleteByTimeRange(ctx echo.Context) error {
 		Data: response,
 	})
 }
+
+func (c SensorController) DeleteByIdAndTimeRange(ctx echo.Context) error {
+	var request model.SensorSearchByIdAndTimeRangeRequest
+
+	err := ctx.Bind(&request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to bind request")
+		return err
+	}
+
+	response, err := c.UseCase.DeleteByIdAndTimeRange(ctx.Request().Context(), &request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to delete sensor record")
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, model.WebResponse[*model.SensorDeleteResponse]{
+		Data: response,
+	})
+}

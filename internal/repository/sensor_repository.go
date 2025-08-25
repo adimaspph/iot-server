@@ -335,3 +335,33 @@ func (r *SensorRepository) DeleteRecordsByTimeRange(
 	}
 	return n, nil
 }
+
+func (r *SensorRepository) DeleteRecordsByIdAndTimeRange(
+	ctx context.Context,
+	id1 string,
+	id2 int64,
+	startTime, endTime time.Time,
+) (int64, error) {
+	ctx, cancel := ctxWithTimeout(ctx)
+	defer cancel()
+
+	const q = `
+        DELETE sr
+        FROM sensor_records sr
+        JOIN sensors s ON s.sensor_id = sr.sensor_id
+        WHERE s.id1 = ? AND s.id2 = ?
+          AND sr.timestamp BETWEEN ? AND ?
+    `
+	res, err := r.DB.ExecContext(ctx, q, id1, id2, startTime, endTime)
+	if err != nil {
+		r.Log.WithError(err).Error("failed to delete records by id + time range")
+		return 0, err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return affected, nil
+}

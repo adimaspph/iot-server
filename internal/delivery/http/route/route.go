@@ -28,4 +28,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 
 	sensor.DELETE("/delete/by-id", c.SensorController.DeleteByCombinedId)
 	sensor.DELETE("/delete/by-time-range", c.SensorController.DeleteByTimeRange)
+	sensor.DELETE("/delete/by-id-time-range", c.SensorController.DeleteByIdAndTimeRange)
 }
