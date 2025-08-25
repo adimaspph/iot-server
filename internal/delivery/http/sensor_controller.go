@@ -125,3 +125,23 @@ func (c SensorController) SearchByIdAndTimeRange(ctx echo.Context) error {
 		Paging: metadata,
 	})
 }
+
+func (c SensorController) DeleteByCombinedId(ctx echo.Context) error {
+	var request model.SensorSearchByIdRequest
+
+	err := ctx.Bind(&request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to bind request")
+		return err
+	}
+
+	response, err := c.UseCase.DeleteByIdCombination(ctx.Request().Context(), &request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to search sensor record")
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, model.WebResponse[*model.SensorDeleteResponse]{
+		Data: response,
+	})
+}
