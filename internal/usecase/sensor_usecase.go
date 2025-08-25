@@ -117,7 +117,7 @@ func (u *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 func (u *SensorUsecase) SearchByIdCombination(ctx context.Context, req *model.SensorSearchByIdRequest) (*model.SensorResponse, *model.PageMetadata, error) {
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("failed to validate request body")
+		u.Log.WithError(err).Error("failed to validate request")
 		return nil, nil, echo.ErrBadRequest
 	}
 
@@ -134,7 +134,7 @@ func (u *SensorUsecase) SearchByIdCombination(ctx context.Context, req *model.Se
 func (u *SensorUsecase) SearchByTimeRange(ctx context.Context, req *model.SensorSearchByTimeRangeRequest) ([]model.SensorResponse, *model.PageMetadata, error) {
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("failed to validate request body")
+		u.Log.WithError(err).Error("failed to validate request")
 		return nil, nil, echo.ErrBadRequest
 	}
 
@@ -151,7 +151,7 @@ func (u *SensorUsecase) SearchByTimeRange(ctx context.Context, req *model.Sensor
 func (u *SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, req *model.SensorSearchByIdAndTimeRangeRequest) (*model.SensorResponse, *model.PageMetadata, error) {
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("failed to validate request body")
+		u.Log.WithError(err).Error("failed to validate request")
 		return nil, nil, echo.ErrBadRequest
 	}
 
@@ -169,7 +169,7 @@ func (u *SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, req *model.S
 func (u *SensorUsecase) DeleteByIdCombination(ctx context.Context, req *model.SensorSearchByIdRequest) (*model.SensorDeleteResponse, error) {
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
-		u.Log.WithError(err).Error("failed to validate request body")
+		u.Log.WithError(err).Error("failed to validate request")
 		return nil, echo.ErrBadRequest
 	}
 
