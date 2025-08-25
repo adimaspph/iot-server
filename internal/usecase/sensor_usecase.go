@@ -175,7 +175,7 @@ func (u *SensorUsecase) DeleteByIdCombination(ctx context.Context, req *model.Se
 
 	deletedRow, err := u.SensorRepository.DeleteRecordsByIdCombination(ctx, req.ID1, req.ID2)
 	if err != nil {
-		u.Log.WithError(err).Error("error getting sensor records")
+		u.Log.WithError(err).Error("error when deleting sensor records")
 		return nil, echo.ErrInternalServerError
 	}
 
