@@ -194,7 +194,7 @@ func (u *SensorUsecase) DeleteByTimeRange(ctx context.Context, req *model.Sensor
 
 	deletedRows, err := u.SensorRepository.DeleteRecordsByTimeRange(ctx, req.Start, req.End)
 	if err != nil {
-		u.Log.WithError(err).Error("error getting sensors records")
+		u.Log.WithError(err).Error("error when deleting sensors records")
 		return nil, echo.ErrInternalServerError
 	}
 

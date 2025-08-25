@@ -137,7 +137,7 @@ func (c SensorController) DeleteByCombinedId(ctx echo.Context) error {
 
 	response, err := c.UseCase.DeleteByIdCombination(ctx.Request().Context(), &request)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to search sensor record")
+		c.Log.WithError(err).Error("failed to delete sensor record")
 		return err
 	}
 
@@ -157,7 +157,7 @@ func (c SensorController) DeleteByTimeRange(ctx echo.Context) error {
 
 	response, err := c.UseCase.DeleteByTimeRange(ctx.Request().Context(), &request)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to search sensor record")
+		c.Log.WithError(err).Error("failed to delete sensor record")
 		return err
 	}
 
