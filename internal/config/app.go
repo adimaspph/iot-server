@@ -1,6 +1,7 @@
 package config
 
 import (
+	"database/sql"
 	"iot-subscriber/internal/delivery/http"
 	"iot-subscriber/internal/delivery/http/route"
 	"iot-subscriber/internal/repository"
@@ -10,11 +11,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"gorm.io/gorm"
 )
 
 type BootstrapConfig struct {
-	DB       *gorm.DB
+	DB       *sql.DB
 	App      *echo.Echo
 	Log      *logrus.Logger
 	Validate *validator.Validate
@@ -23,7 +23,7 @@ type BootstrapConfig struct {
 
 func Bootstrap(config *BootstrapConfig) {
 	// setup repository
-	sensorRepository := repository.NewSensorRepository(config.Log)
+	sensorRepository := repository.NewSensorRepository(config.DB, config.Log)
 	sensorRecordRepository := repository.NewSensorRecordRepository(config.Log)
 
 	// setup use cases

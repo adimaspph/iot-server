@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"iot-subscriber/internal/entity"
 	"iot-subscriber/internal/model"
@@ -12,18 +13,23 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 )
 
 type SensorUsecase struct {
-	DB               *gorm.DB
+	DB               *sql.DB
 	Log              *logrus.Logger
 	Validate         *validator.Validate
 	SensorRepository *repository.SensorRepository
 	SensorRecordRepo *repository.SensorRecordRepository
 }
 
-func NewSensorUsecase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate, sensorRepository *repository.SensorRepository, sensorRecordRepo *repository.SensorRecordRepository) *SensorUsecase {
+func NewSensorUsecase(
+	db *sql.DB,
+	logger *logrus.Logger,
+	validate *validator.Validate,
+	sensorRepository *repository.SensorRepository,
+	sensorRecordRepo *repository.SensorRecordRepository,
+) *SensorUsecase {
 	return &SensorUsecase{
 		DB:               db,
 		Log:              logger,
@@ -33,35 +39,45 @@ func NewSensorUsecase(db *gorm.DB, logger *logrus.Logger, validate *validator.Va
 	}
 }
 
-func (c *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorRequest) (*model.SensorResponse, error) {
-	tx := c.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("failed to validate request body")
+func (u *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorRequest) (*model.SensorResponse, error) {
+	// validate
+	if err := u.Validate.Struct(request); err != nil {
+		u.Log.WithError(err).Error("failed to validate request body")
 		return nil, echo.ErrBadRequest
 	}
 
 	// Parse with RFC3339
 	requestTimestamp, err := time.Parse(time.RFC3339, request.Timestamp)
 	if err != nil {
-		c.Log.WithError(err).Error("failed to parse timestamp")
+		u.Log.WithError(err).Error("failed to parse timestamp")
 		return nil, echo.ErrBadRequest
 	}
 
-	// Check if sensor exists
-	var sensor *entity.Sensor
-	sensor, err = c.SensorRepository.FindByUnique(tx, request.ID1, request.ID2, request.SensorType)
+	// begin tx
+	tx, err := u.DB.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		u.Log.WithError(err).Error("failed to begin transaction")
+		return nil, echo.ErrInternalServerError
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		// Sensor does not exist, create new
-		sensor = &entity.Sensor{
-			ID1:        request.ID1,
-			ID2:        request.ID2,
-			SensorType: request.SensorType,
-		}
-		if err := c.SensorRepository.Create(tx, sensor); err != nil {
-			c.Log.WithError(err).Error("failed to create sensor")
+	// find or create sensor
+	sensor, err := u.SensorRepository.FindByUnique(ctx, request.ID1, request.ID2, request.SensorType)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			sensor = &entity.Sensor{
+				ID1:        request.ID1,
+				ID2:        request.ID2,
+				SensorType: request.SensorType,
+			}
+			if err := u.SensorRepository.CreateTx(ctx, tx, sensor); err != nil {
+				u.Log.WithError(err).Error("failed to create sensor")
+				return nil, echo.ErrInternalServerError
+			}
+		} else {
+			u.Log.WithError(err).Error("failed to find sensor")
 			return nil, echo.ErrInternalServerError
 		}
 	}
@@ -72,16 +88,14 @@ func (c *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 		SensorValue: request.SensorValue,
 		Timestamp:   requestTimestamp,
 	}
-
-	// Insert new sensor
-	if err := c.SensorRecordRepo.Create(tx, record); err != nil {
-		c.Log.WithError(err).Error("failed to create sensor record")
+	if err := u.SensorRecordRepo.CreateTx(ctx, tx, record); err != nil {
+		u.Log.WithError(err).Error("failed to create sensor record")
 		return nil, echo.ErrInternalServerError
 	}
 
-	// Commit transaction
-	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
+	// commit
+	if err := tx.Commit(); err != nil {
+		u.Log.WithError(err).Error("failed to commit transaction")
 		return nil, echo.ErrInternalServerError
 	}
 
@@ -97,93 +111,57 @@ func (c *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 			},
 		},
 	}
-
 	return resp, nil
 }
 
-func (c SensorUsecase) SearchByIdCombination(ctx context.Context, request *model.SensorSearchByIdRequest) (*model.SensorResponse, *model.PageMetadata, error) {
-	tx := c.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
-	// validate request
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("failed to validate request body")
-		return nil, nil, echo.ErrBadRequest
-	}
-
-	sensor, metadata, err := c.SensorRepository.FindSensorRecordsByIdCombination(tx, request.ID1, request.ID2, request.Page, request.PageSize)
-
-	if err != nil {
-		c.Log.WithError(err).Error("error getting sensor records")
-		return nil, nil, echo.ErrNotFound
-	}
-
-	// Commit transaction
-	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
-		return nil, nil, echo.ErrInternalServerError
-	}
-
-	// Build response
-	resp := converter.SensorToResponse(sensor)
-
-	return resp, metadata, nil
-}
-
-func (u SensorUsecase) SearchByTimeRange(ctx context.Context, request *model.SensorSearchByTimeRangeRequest) ([]model.SensorResponse, *model.PageMetadata, error) {
-	tx := u.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
-	// validate request
-	if err := u.Validate.Struct(request); err != nil {
+func (u *SensorUsecase) SearchByIdCombination(ctx context.Context, req *model.SensorSearchByIdRequest) (*model.SensorResponse, *model.PageMetadata, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request body")
 		return nil, nil, echo.ErrBadRequest
 	}
 
-	sensors, metadata, err := u.SensorRepository.FindSensorRecordsByTimeRange(tx, request.Start, request.End, request.Page, request.PageSize)
-
+	sensor, meta, err := u.SensorRepository.FindSensorRecordsByIdCombination(ctx, req.ID1, req.ID2, req.Page, req.PageSize)
 	if err != nil {
-		u.Log.WithError(err).Error("error getting sensors records")
-		return nil, nil, echo.ErrNotFound
-	}
-
-	// Commit transaction
-	if err := tx.Commit().Error; err != nil {
-		u.Log.WithError(err).Error("failed to commit transaction")
+		u.Log.WithError(err).Error("error getting sensor records")
 		return nil, nil, echo.ErrInternalServerError
 	}
 
-	// Build response
-	resp := converter.SensorRecordsToResponse(sensors)
-
-	return resp, metadata, nil
+	resp := converter.SensorToResponse(sensor)
+	return resp, meta, nil
 }
 
-func (c SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, request *model.SensorSearchByIdAndTimeRangeRequest) (*model.SensorResponse, *model.PageMetadata, error) {
-	tx := c.DB.WithContext(ctx).Begin()
-	defer tx.Rollback()
-
-	// validate request
-	if err := c.Validate.Struct(request); err != nil {
-		c.Log.WithError(err).Error("failed to validate request body")
+func (u *SensorUsecase) SearchByTimeRange(ctx context.Context, req *model.SensorSearchByTimeRangeRequest) ([]model.SensorResponse, *model.PageMetadata, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Error("failed to validate request body")
 		return nil, nil, echo.ErrBadRequest
 	}
 
-	sensor, metadata, err := c.SensorRepository.FindSensorRecordsByIdAndTimeRange(tx, request.ID1, request.ID2, request.Start, request.End, request.Page, request.PageSize)
-
+	sensors, meta, err := u.SensorRepository.FindSensorRecordsByTimeRange(ctx, req.Start, req.End, req.Page, req.PageSize)
 	if err != nil {
-		c.Log.WithError(err).Error("error getting sensor records")
-		return nil, nil, echo.ErrNotFound
-	}
-
-	// Commit transaction
-	if err := tx.Commit().Error; err != nil {
-		c.Log.WithError(err).Error("failed to commit transaction")
+		u.Log.WithError(err).Error("error getting sensors records")
 		return nil, nil, echo.ErrInternalServerError
 	}
 
-	// Build response
+	resp := converter.SensorRecordsToResponse(sensors)
+	return resp, meta, nil
+}
+
+func (u *SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, req *model.SensorSearchByIdAndTimeRangeRequest) (*model.SensorResponse, *model.PageMetadata, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Error("failed to validate request body")
+		return nil, nil, echo.ErrBadRequest
+	}
+
+	sensor, meta, err := u.SensorRepository.FindSensorRecordsByIdAndTimeRange(ctx, req.ID1, req.ID2, req.Start, req.End, req.Page, req.PageSize)
+	if err != nil {
+		u.Log.WithError(err).Error("error getting sensor records")
+		return nil, nil, echo.ErrInternalServerError
+	}
+
 	resp := converter.SensorToResponse(sensor)
 
-	return resp, metadata, nil
+	return resp, meta, nil
 }
