@@ -165,3 +165,22 @@ func (u *SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, req *model.S
 
 	return resp, meta, nil
 }
+
+func (u *SensorUsecase) DeleteByIdCombination(ctx context.Context, req *model.SensorSearchByIdRequest) (*model.SensorDeleteResponse, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Error("failed to validate request body")
+		return nil, echo.ErrBadRequest
+	}
+
+	deletedRow, err := u.SensorRepository.DeleteRecordsByIdCombination(ctx, req.ID1, req.ID2)
+	if err != nil {
+		u.Log.WithError(err).Error("error getting sensor records")
+		return nil, echo.ErrInternalServerError
+	}
+
+	resp := &model.SensorDeleteResponse{
+		Deleted: deletedRow,
+	}
+	return resp, nil
+}
