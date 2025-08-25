@@ -23,4 +23,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 	sensor.POST("/create", c.SensorController.CreateSensor)
 	sensor.GET("/search/by-id", c.SensorController.SearchByCombinedId)
 	sensor.GET("/search/by-time-range", c.SensorController.SearchByTimeRange)
+	sensor.GET("/search/by-id-time-range", c.SensorController.SearchByIdAndTimeRange)
 }
