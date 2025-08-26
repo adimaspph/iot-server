@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"iot-server/internal/delivery/http"
 	"iot-server/internal/delivery/http/route"
+	"iot-server/internal/delivery/messaging"
 	"iot-server/internal/repository"
 	"iot-server/internal/usecase"
 
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -19,6 +21,7 @@ type BootstrapConfig struct {
 	Log      *logrus.Logger
 	Validate *validator.Validate
 	Config   *viper.Viper
+	Mqtt     *mqtt.Client
 }
 
 func Bootstrap(config *BootstrapConfig) {
