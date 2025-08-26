@@ -32,4 +32,5 @@ func (c *RouteConfig) SetupAuthRoute() {
 
 	sensor.PATCH("/update/by-id", c.SensorController.UpdateByCombinedId)
 	sensor.PATCH("/update/by-time-range", c.SensorController.UpdateByTimeRange)
+	sensor.PATCH("/update/by-id-time-range", c.SensorController.UpdateByIdAndTimeRange)
 }

@@ -8,6 +8,7 @@ import (
 	"iot-server/internal/model"
 	"iot-server/internal/model/converter"
 	"iot-server/internal/repository"
+	"net/http"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -250,6 +251,25 @@ func (u *SensorUsecase) UpdateByTimeRange(ctx context.Context, req *model.Sensor
 	}
 
 	affectedRow, err := u.SensorRepository.UpdateSensorValuesByTimeRange(ctx, req.Start, req.End, req.SensorValue)
+	if err != nil {
+		u.Log.WithError(err).Error("error when updating sensor records")
+		return nil, echo.ErrInternalServerError
+	}
+
+	resp := &model.SensorUpdateResponse{
+		Updated: affectedRow,
+	}
+	return resp, nil
+}
+
+func (u *SensorUsecase) UpdateByIdAndTimeRange(ctx context.Context, req *model.SensorUpdateByIdAndTimeRangeRequest) (*model.SensorUpdateResponse, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Error("failed to validate request")
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	affectedRow, err := u.SensorRepository.UpdateSensorValueByIdAndTimeRange(ctx, req.ID1, req.ID2, req.Start, req.End, req.SensorValue)
 	if err != nil {
 		u.Log.WithError(err).Error("error when updating sensor records")
 		return nil, echo.ErrInternalServerError
