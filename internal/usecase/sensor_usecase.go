@@ -222,3 +222,22 @@ func (u *SensorUsecase) DeleteByIdAndTimeRange(ctx context.Context, req *model.S
 	}
 	return resp, nil
 }
+
+func (u *SensorUsecase) UpdateByIdCombination(ctx context.Context, req *model.SensorUpdateByIdRequest) (*model.SensorUpdateResponse, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Error("failed to validate request")
+		return nil, echo.ErrBadRequest
+	}
+
+	affectedRow, err := u.SensorRepository.UpdateSensorValuesByIdCombination(ctx, req.ID1, req.ID2, req.SensorValue)
+	if err != nil {
+		u.Log.WithError(err).Error("error when updating sensor records")
+		return nil, echo.ErrInternalServerError
+	}
+
+	resp := &model.SensorUpdateResponse{
+		Updated: affectedRow,
+	}
+	return resp, nil
+}

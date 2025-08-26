@@ -48,3 +48,13 @@ type SensorSearchByIdAndTimeRangeRequest struct {
 type SensorDeleteResponse struct {
 	Deleted int64 `json:"deleted"`
 }
+
+type SensorUpdateResponse struct {
+	Updated int64 `json:"updated"`
+}
+
+type SensorUpdateByIdRequest struct {
+	ID1         string  `json:"id1" validate:"required,uppercase"`
+	ID2         int64   `json:"id2" validate:"required"`
+	SensorValue float64 `json:"sensor_value" validate:"required"`
+}
