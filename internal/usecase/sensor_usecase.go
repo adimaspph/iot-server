@@ -9,7 +9,6 @@ import (
 	"iot-server/internal/model/converter"
 	"iot-server/internal/repository"
 	"net/http"
-	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -47,13 +46,6 @@ func (u *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 		return nil, echo.ErrBadRequest
 	}
 
-	// Parse with RFC3339
-	requestTimestamp, err := time.Parse(time.RFC3339, request.Timestamp)
-	if err != nil {
-		u.Log.WithError(err).Error("failed to parse timestamp")
-		return nil, echo.ErrBadRequest
-	}
-
 	// begin tx
 	tx, err := u.DB.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
@@ -87,7 +79,7 @@ func (u *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 	record := &entity.SensorRecord{
 		SensorID:    sensor.SensorID,
 		SensorValue: request.SensorValue,
-		Timestamp:   requestTimestamp,
+		Timestamp:   request.Timestamp,
 	}
 	if err := u.SensorRecordRepo.CreateTx(ctx, tx, record); err != nil {
 		u.Log.WithError(err).Error("failed to create sensor record")
