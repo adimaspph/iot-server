@@ -392,3 +392,30 @@ func (r *SensorRepository) UpdateSensorValuesByIdCombination(
 	}
 	return affected, nil
 }
+
+func (r *SensorRepository) UpdateSensorValuesByTimeRange(
+	ctx context.Context,
+	startTime, endTime time.Time,
+	newValue float64,
+) (int64, error) {
+	ctx, cancel := ctxWithTimeout(ctx)
+	defer cancel()
+
+	const q = `
+		UPDATE sensor_records
+		SET sensor_value = ?
+		WHERE timestamp BETWEEN ? AND ?
+	`
+	res, err := r.DB.ExecContext(ctx, q, newValue, startTime, endTime)
+	if err != nil {
+		r.Log.WithError(err).Error("failed to update sensor values by time range")
+		return 0, err
+	}
+
+	n, err := res.RowsAffected()
+	if err != nil {
+		r.Log.WithError(err).Error("failed to get number of rows affected after update")
+		return 0, err
+	}
+	return n, nil
+}

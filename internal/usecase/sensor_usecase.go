@@ -241,3 +241,22 @@ func (u *SensorUsecase) UpdateByIdCombination(ctx context.Context, req *model.Se
 	}
 	return resp, nil
 }
+
+func (u *SensorUsecase) UpdateByTimeRange(ctx context.Context, req *model.SensorUpdateByTimeRangeRequest) (*model.SensorUpdateResponse, error) {
+	// validate
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Error("failed to validate request")
+		return nil, echo.ErrBadRequest
+	}
+
+	affectedRow, err := u.SensorRepository.UpdateSensorValuesByTimeRange(ctx, req.Start, req.End, req.SensorValue)
+	if err != nil {
+		u.Log.WithError(err).Error("error when updating sensor records")
+		return nil, echo.ErrInternalServerError
+	}
+
+	resp := &model.SensorUpdateResponse{
+		Updated: affectedRow,
+	}
+	return resp, nil
+}

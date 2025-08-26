@@ -58,3 +58,9 @@ type SensorUpdateByIdRequest struct {
 	ID2         int64   `json:"id2" validate:"required"`
 	SensorValue float64 `json:"sensor_value" validate:"required"`
 }
+
+type SensorUpdateByTimeRangeRequest struct {
+	Start       time.Time `json:"start" validate:"required"`
+	End         time.Time `json:"end" validate:"required"`
+	SensorValue float64   `json:"sensor_value" validate:"required"`
+}

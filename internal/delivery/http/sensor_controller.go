@@ -205,3 +205,23 @@ func (c SensorController) UpdateByCombinedId(ctx echo.Context) error {
 		Data: response,
 	})
 }
+
+func (c SensorController) UpdateByTimeRange(ctx echo.Context) error {
+	var request model.SensorUpdateByTimeRangeRequest
+
+	err := ctx.Bind(&request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to bind request")
+		return err
+	}
+
+	response, err := c.UseCase.UpdateByTimeRange(ctx.Request().Context(), &request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to update sensor record")
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, model.WebResponse[*model.SensorUpdateResponse]{
+		Data: response,
+	})
+}
