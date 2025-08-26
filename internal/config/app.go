@@ -32,6 +32,12 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup use cases
 	sensorUseCase := usecase.NewSensorUsecase(config.DB, config.Log, config.Validate, sensorRepository, sensorRecordRepository)
 
+	// setup MQTT broker
+	sensorConsumer := messaging.NewSensorConsumer(sensorUseCase, config.Log)
+	mqttClient := *config.Mqtt
+	mqttClient.Subscribe(config.Config.GetString("MQTT_TOPIC"), 0, sensorConsumer.SensorMQTTHandler)
+	config.Log.Info(mqttClient.IsConnected())
+
 	// setup controller
 	sensorController := http.NewSensorController(sensorUseCase, config.Log)
 
