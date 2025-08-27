@@ -47,6 +47,13 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 		return nil, echo.ErrBadRequest
 	}
 
+	// Validate role
+	role := entity.UserRole(request.Role)
+	if role != entity.RoleAdmin && role != entity.RoleUser {
+		u.Log.Error("role is invalid")
+		return nil, echo.ErrBadRequest
+	}
+
 	// Check existence
 	if _, err := u.Repository.FindByID(ctx, request.ID); err == nil {
 		u.Log.Warn("user id already exists")
