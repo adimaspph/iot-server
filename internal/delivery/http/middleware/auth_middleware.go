@@ -12,7 +12,7 @@ import (
 
 const ctxAuthKey = "auth"
 
-func NewAuth(userUC *usecase.UserUsecase, tokenUtil *util.TokenUtil) echo.MiddlewareFunc {
+func NewAuth(userUC *usecase.UserUsecase, tokenUtil *util.TokenUtil, rateLimiterUtil *util.RateLimiterUtil) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
@@ -34,6 +34,10 @@ func NewAuth(userUC *usecase.UserUsecase, tokenUtil *util.TokenUtil) echo.Middle
 			if err != nil {
 				userUC.Log.WithError(err).Warn("failed to parsing/validation token")
 				return echo.ErrUnauthorized
+			}
+
+			if !rateLimiterUtil.IsAllowed(c.Request().Context(), auth) {
+				return echo.ErrTooManyRequests
 			}
 
 			// Store into Echo context for downstream handlers

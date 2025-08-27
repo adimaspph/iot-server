@@ -39,8 +39,12 @@ func Bootstrap(config *BootstrapConfig) {
 	sensorRecordRepository := repository.NewSensorRecordRepository(config.Log)
 	userRepository := repository.NewUserRepository(config.DB, config.Log)
 
+	// setup util
 	redisClient := config.Redis
 	tokenUtil := util.NewTokenUtil(config.Config.GetString("AUTH_SECRET"), redisClient)
+	maxRequest := config.Config.GetInt64("RATE_LIMIT_MAX_REQUEST")
+	duration := config.Config.GetInt("RATE_LIMIT_DURATION")
+	rateLimitUtil := util.NewRateLimiterUtil(redisClient, config.Log, maxRequest, duration)
 
 	// setup use cases
 	sensorUseCase := usecase.NewSensorUsecase(config.DB, config.Log, config.Validate, sensorRepository, sensorRecordRepository)
@@ -56,7 +60,7 @@ func Bootstrap(config *BootstrapConfig) {
 	userController := http.NewUserController(userUsecase, config.Log)
 
 	// setup middleware
-	authMiddleware := middleware.NewAuth(userUsecase, tokenUtil)
+	authMiddleware := middleware.NewAuth(userUsecase, tokenUtil, rateLimitUtil)
 
 	routeConfig := route.RouteConfig{
 		App:              config.App,
