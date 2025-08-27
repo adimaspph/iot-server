@@ -38,3 +38,21 @@ func (c *UserController) Register(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, model.WebResponse[*model.UserResponse]{Data: response})
 }
+
+func (c *UserController) Login(ctx echo.Context) error {
+	var request model.LoginUserRequest
+
+	err := ctx.Bind(&request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to bind request")
+		return err
+	}
+
+	response, err := c.UseCase.Login(ctx.Request().Context(), &request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to login")
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, model.WebResponse[*model.UserResponse]{Data: response})
+}
