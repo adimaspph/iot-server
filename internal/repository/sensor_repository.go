@@ -11,8 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const defaultQueryTimeout = 5 * time.Second
-
 type SensorRepository struct {
 	DB  *sql.DB
 	Log *logrus.Logger
@@ -23,30 +21,6 @@ func NewSensorRepository(db *sql.DB, log *logrus.Logger) *SensorRepository {
 		DB:  db,
 		Log: log,
 	}
-}
-
-// helper
-func pageMeta(page, pageSize int, total int64) *model.PageMetadata {
-	if page < 1 {
-		page = 1
-	}
-	if pageSize < 1 {
-		pageSize = 10
-	}
-	totalPage := (total + int64(pageSize) - 1) / int64(pageSize)
-	return &model.PageMetadata{
-		Page:      page,
-		Size:      pageSize,
-		TotalItem: total,
-		TotalPage: totalPage,
-	}
-}
-
-func ctxWithTimeout(parent context.Context) (context.Context, context.CancelFunc) {
-	if parent == nil {
-		parent = context.Background()
-	}
-	return context.WithTimeout(parent, defaultQueryTimeout)
 }
 
 // Create
