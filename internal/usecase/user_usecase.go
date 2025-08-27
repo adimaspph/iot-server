@@ -153,3 +153,33 @@ func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*
 		Token: token,
 	}, nil
 }
+
+func (u *UserUsecase) Logout(ctx context.Context, req *model.LogoutUserRequest) (bool, error) {
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Warn("failed to validate request")
+		return false, fmt.Errorf("%w: %v", echo.ErrBadRequest, err)
+	}
+
+	// Ensure user exists
+	user, err := u.Repository.FindByID(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, echo.ErrNotFound
+		}
+		u.Log.WithError(err).Error("failed to find user by id")
+		return false, echo.ErrInternalServerError
+	}
+
+	auth := &model.Auth{
+		ID: user.ID,
+	}
+
+	// Remove token from redis
+	err = u.TokenUtil.RemoveToken(ctx, auth)
+	if err != nil {
+		u.Log.WithError(err).Error("failed to create token")
+		return false, echo.ErrInternalServerError
+	}
+
+	return true, nil
+}
