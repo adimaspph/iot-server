@@ -17,3 +17,7 @@ type PageMetadata struct {
 	TotalItem int64 `json:"total_item"`
 	TotalPage int64 `json:"total_page"`
 }
+
+type MessageResponse[T any] struct {
+	Message string `json:"message"`
+}
