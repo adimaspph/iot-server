@@ -2,6 +2,8 @@ package route
 
 import (
 	"iot-server/internal/delivery/http"
+	"iot-server/internal/delivery/http/middleware"
+	"iot-server/internal/entity"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,7 +21,6 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
-	c.App.POST("/api/users", c.UserController.Register)
 	c.App.POST("/api/users/login", c.UserController.Login)
 }
 
@@ -27,21 +28,23 @@ func (c *RouteConfig) SetupAuthRoute() {
 	v1 := c.App.Group("/api/v1", c.AuthMiddleware)
 
 	sensor := v1.Group("/sensor")
-	sensor.POST("/create", c.SensorController.CreateSensor)
-
+	// Authenticated
 	sensor.GET("/search/by-id", c.SensorController.SearchByCombinedId)
 	sensor.GET("/search/by-time-range", c.SensorController.SearchByTimeRange)
 	sensor.GET("/search/by-id-time-range", c.SensorController.SearchByIdAndTimeRange)
 
-	sensor.DELETE("/delete/by-id", c.SensorController.DeleteByCombinedId)
-	sensor.DELETE("/delete/by-time-range", c.SensorController.DeleteByTimeRange)
-	sensor.DELETE("/delete/by-id-time-range", c.SensorController.DeleteByIdAndTimeRange)
+	// Admin-only (mutations)
+	admin := sensor.Group("", middleware.RequireRoles(entity.RoleAdmin))
+	admin.POST("/create", c.SensorController.CreateSensor)
+	admin.DELETE("/delete/by-id", c.SensorController.DeleteByCombinedId)
+	admin.DELETE("/delete/by-time-range", c.SensorController.DeleteByTimeRange)
+	admin.DELETE("/delete/by-id-time-range", c.SensorController.DeleteByIdAndTimeRange)
+	admin.PATCH("/update/by-id", c.SensorController.UpdateByCombinedId)
+	admin.PATCH("/update/by-time-range", c.SensorController.UpdateByTimeRange)
+	admin.PATCH("/update/by-id-time-range", c.SensorController.UpdateByIdAndTimeRange)
 
-	sensor.PATCH("/update/by-id", c.SensorController.UpdateByCombinedId)
-	sensor.PATCH("/update/by-time-range", c.SensorController.UpdateByTimeRange)
-	sensor.PATCH("/update/by-id-time-range", c.SensorController.UpdateByIdAndTimeRange)
-
-	// user
+	// Authenticated
 	user := c.App.Group("/api/users", c.AuthMiddleware)
-	user.POST("/logout", c.UserController.Logout)
+	user.POST("", c.UserController.Register, middleware.RequireRoles(entity.RoleAdmin))
+	user.GET("/logout", c.UserController.Logout)
 }
