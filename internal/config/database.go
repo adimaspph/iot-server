@@ -49,6 +49,8 @@ func NewDatabase(viper *viper.Viper, log *logrus.Logger) *sql.DB {
 	connection.SetConnMaxLifetime(time.Second * time.Duration(maxLifeTimeConnection))
 	connection.SetConnMaxIdleTime(time.Second * time.Duration(maxIdleTimeConnection))
 
+	log.Info("Database mysql connected successfully")
+
 	return connection
 }
 
