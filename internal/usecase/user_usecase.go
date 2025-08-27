@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"iot-server/internal/entity"
 	"iot-server/internal/model"
+	"iot-server/internal/model/converter"
 	"iot-server/internal/repository"
 	"iot-server/internal/util"
 	"time"
@@ -101,10 +102,8 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 		return nil, echo.ErrInternalServerError
 	}
 
-	return &model.UserResponse{
-		ID:   user.ID,
-		Name: user.Name,
-	}, nil
+	response := converter.UserToResponse(user)
+	return response, nil
 }
 
 func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
@@ -135,11 +134,8 @@ func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*
 		return nil, echo.ErrInternalServerError
 	}
 
-	return &model.UserResponse{
-		ID:    user.ID,
-		Name:  user.Name,
-		Token: token,
-	}, nil
+	response := converter.UserToTokenResponse(user, token)
+	return response, nil
 }
 
 func (u *UserUsecase) Logout(ctx context.Context, auth *model.Auth) (bool, error) {
