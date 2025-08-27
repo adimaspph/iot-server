@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"iot-server/internal/entity"
 	"iot-server/internal/model"
 	"iot-server/internal/usecase"
 	"iot-server/internal/util"
@@ -49,4 +50,24 @@ func GetUser(c echo.Context) (*model.Auth, bool) {
 	}
 	a, ok := v.(*model.Auth)
 	return a, ok
+}
+
+func RequireRoles(allowed ...entity.UserRole) echo.MiddlewareFunc {
+	allow := make(map[entity.UserRole]bool, len(allowed))
+	for _, r := range allowed {
+		allow[r] = true
+	}
+
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			auth, ok := GetUser(c)
+			if !ok {
+				return echo.ErrUnauthorized
+			}
+			if !allow[entity.UserRole(auth.Role)] {
+				return echo.ErrForbidden
+			}
+			return next(c)
+		}
+	}
 }
