@@ -56,3 +56,23 @@ func (c *UserController) Login(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, model.WebResponse[*model.UserResponse]{Data: response})
 }
+
+func (c *UserController) Logout(ctx echo.Context) error {
+	var request model.LogoutUserRequest
+
+	err := ctx.Bind(&request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to bind request")
+		return err
+	}
+
+	_, err = c.UseCase.Logout(ctx.Request().Context(), &request)
+	if err != nil {
+		c.Log.WithError(err).Error("failed to logout")
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, model.MessageResponse[string]{
+		Message: "Logout success",
+	})
+}
