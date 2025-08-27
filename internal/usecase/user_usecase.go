@@ -118,3 +118,60 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 		Name: user.Name,
 	}, nil
 }
+
+func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
+	if err := u.Validate.Struct(req); err != nil {
+		u.Log.WithError(err).Warn("failed to validate request")
+		return nil, fmt.Errorf("%w: %v", echo.ErrBadRequest, err)
+	}
+
+	user, err := u.Repository.FindByID(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			u.Log.WithError(err).Warn("user not found")
+			return nil, fmt.Errorf("%w: %v", echo.ErrUnauthorized, errors.New("user not found"))
+		}
+		u.Log.WithError(err).Error("failed to find user by id")
+		return nil, echo.ErrInternalServerError
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		u.Log.WithError(err).Warn("wrong password")
+		return nil, fmt.Errorf("%w: %v", echo.ErrUnauthorized, errors.New("wrong password"))
+	}
+
+	// Create JWT (stateless) and store it to redis cache
+	token, err := u.TokenUtil.CreateToken(ctx, &model.Auth{ID: user.ID})
+	if err != nil {
+		u.Log.WithError(err).Error("failed to create token")
+		return nil, echo.ErrInternalServerError
+	}
+
+	// store token in database
+	if _, err := u.Repository.UpdateToken(ctx, user.ID, token); err != nil {
+		u.Log.WithError(err).Error("failed to update token")
+		return nil, echo.ErrInternalServerError
+	}
+
+	// begin tx
+	tx, err := u.DB.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		u.Log.WithError(err).Error("failed to begin transaction")
+		return nil, echo.ErrInternalServerError
+	}
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	// commit
+	if err := tx.Commit(); err != nil {
+		u.Log.WithError(err).Error("failed to commit transaction")
+		return nil, echo.ErrInternalServerError
+	}
+
+	return &model.UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Token: token,
+	}, nil
+}
