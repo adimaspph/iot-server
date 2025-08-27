@@ -43,7 +43,7 @@ func (u *SensorUsecase) Create(ctx context.Context, request *model.CreateSensorR
 	// validate
 	if err := u.Validate.Struct(request); err != nil {
 		u.Log.WithError(err).Error("failed to validate request body")
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	// begin tx
@@ -111,7 +111,7 @@ func (u *SensorUsecase) SearchByIdCombination(ctx context.Context, req *model.Se
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, nil, echo.ErrBadRequest
+		return nil, nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	sensor, meta, err := u.SensorRepository.FindSensorRecordsByIdCombination(ctx, req.ID1, req.ID2, req.Page, req.PageSize)
@@ -128,7 +128,7 @@ func (u *SensorUsecase) SearchByTimeRange(ctx context.Context, req *model.Sensor
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, nil, echo.ErrBadRequest
+		return nil, nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	sensors, meta, err := u.SensorRepository.FindSensorRecordsByTimeRange(ctx, req.Start, req.End, req.Page, req.PageSize)
@@ -145,7 +145,7 @@ func (u *SensorUsecase) SearchByIdAndTimeRange(ctx context.Context, req *model.S
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, nil, echo.ErrBadRequest
+		return nil, nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	sensor, meta, err := u.SensorRepository.FindSensorRecordsByIdAndTimeRange(ctx, req.ID1, req.ID2, req.Start, req.End, req.Page, req.PageSize)
@@ -163,7 +163,7 @@ func (u *SensorUsecase) DeleteByIdCombination(ctx context.Context, req *model.Se
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	deletedRow, err := u.SensorRepository.DeleteRecordsByIdCombination(ctx, req.ID1, req.ID2)
@@ -182,7 +182,7 @@ func (u *SensorUsecase) DeleteByTimeRange(ctx context.Context, req *model.Sensor
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	deletedRows, err := u.SensorRepository.DeleteRecordsByTimeRange(ctx, req.Start, req.End)
@@ -201,7 +201,7 @@ func (u *SensorUsecase) DeleteByIdAndTimeRange(ctx context.Context, req *model.S
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	deletedRows, err := u.SensorRepository.DeleteRecordsByIdAndTimeRange(ctx, req.ID1, req.ID2, req.Start, req.End)
@@ -220,7 +220,7 @@ func (u *SensorUsecase) UpdateByIdCombination(ctx context.Context, req *model.Se
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	affectedRow, err := u.SensorRepository.UpdateSensorValuesByIdCombination(ctx, req.ID1, req.ID2, req.SensorValue)
@@ -239,7 +239,7 @@ func (u *SensorUsecase) UpdateByTimeRange(ctx context.Context, req *model.Sensor
 	// validate
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
-		return nil, echo.ErrBadRequest
+		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	affectedRow, err := u.SensorRepository.UpdateSensorValuesByTimeRange(ctx, req.Start, req.End, req.SensorValue)
