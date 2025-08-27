@@ -33,7 +33,7 @@ func (t TokenUtil) CreateToken(ctx context.Context, auth *model.Auth) (string, e
 		return "", err
 	}
 
-	_, err = t.Redis.SetEx(ctx, jwtToken, auth.ID, time.Hour*25*30).Result()
+	_, err = t.Redis.SetEx(ctx, auth.ID, jwtToken, time.Hour*25*30).Result()
 	if err != nil {
 		return "", err
 	}
@@ -56,12 +56,12 @@ func (t TokenUtil) ParseToken(ctx context.Context, jwtToken string) (*model.Auth
 		return nil, echo.ErrUnauthorized
 	}
 
-	result, err := t.Redis.Exists(ctx, jwtToken).Result()
+	result, err := t.Redis.Get(ctx, claims["id"].(string)).Result()
 	if err != nil {
 		return nil, err
 	}
 
-	if result == 0 {
+	if result != jwtToken {
 		return nil, echo.ErrUnauthorized
 	}
 
