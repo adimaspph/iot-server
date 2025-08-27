@@ -75,6 +75,7 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 		ID:        request.ID,
 		Name:      request.Name,
 		Password:  string(hash),
+		Role:      string(role),
 		CreatedAt: time.Now().UnixMilli(),
 		UpdatedAt: time.Now().UnixMilli(),
 	}
