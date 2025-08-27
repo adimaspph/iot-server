@@ -19,6 +19,7 @@ func main() {
 	validate := config.NewValidator(viperConfig)
 	app := config.NewEcho(viperConfig)
 	mqttClient := config.NewMqtt(viperConfig, log)
+	redisClient := config.NewRedis(viperConfig, log)
 
 	// Connect MQTT
 	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
@@ -44,6 +45,7 @@ func main() {
 		Validate: validate,
 		Config:   viperConfig,
 		Mqtt:     &mqttClient,
+		Redis:    redisClient,
 	})
 
 	// Wait for shutdown signal

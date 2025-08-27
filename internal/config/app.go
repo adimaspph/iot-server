@@ -11,6 +11,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -22,6 +23,7 @@ type BootstrapConfig struct {
 	Validate *validator.Validate
 	Config   *viper.Viper
 	Mqtt     *mqtt.Client
+	Redis    *redis.Client
 }
 
 func Bootstrap(config *BootstrapConfig) {
