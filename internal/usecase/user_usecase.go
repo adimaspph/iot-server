@@ -147,28 +147,6 @@ func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*
 		return nil, echo.ErrInternalServerError
 	}
 
-	// store token in database
-	if _, err := u.Repository.UpdateToken(ctx, user.ID, token); err != nil {
-		u.Log.WithError(err).Error("failed to update token")
-		return nil, echo.ErrInternalServerError
-	}
-
-	// begin tx
-	tx, err := u.DB.BeginTx(ctx, &sql.TxOptions{})
-	if err != nil {
-		u.Log.WithError(err).Error("failed to begin transaction")
-		return nil, echo.ErrInternalServerError
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
-	// commit
-	if err := tx.Commit(); err != nil {
-		u.Log.WithError(err).Error("failed to commit transaction")
-		return nil, echo.ErrInternalServerError
-	}
-
 	return &model.UserResponse{
 		ID:    user.ID,
 		Name:  user.Name,
