@@ -36,7 +36,7 @@ func (r *UserRepository) Create(ctx context.Context, u *entity.User) error {
 
 	const q = `
 		INSERT INTO users (id, name, password, role, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?)
 	`
 	_, err := r.DB.ExecContext(ctx, q,
 		u.ID,
