@@ -35,14 +35,13 @@ func (r *UserRepository) Create(ctx context.Context, u *entity.User) error {
 	}
 
 	const q = `
-		INSERT INTO users (id, name, password, token, created_at, updated_at)
+		INSERT INTO users (id, name, password, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?, ?)
 	`
 	_, err := r.DB.ExecContext(ctx, q,
 		u.ID,
 		u.Name,
 		u.Password,
-		u.Token,
 		u.CreatedAt,
 		u.UpdatedAt,
 	)
@@ -77,14 +76,14 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*entity.User,
 	defer cancel()
 
 	const q = `
-		SELECT id, name, password, token, created_at, updated_at
+		SELECT id, name, password, created_at, updated_at
 		FROM users
 		WHERE id = ?
 		LIMIT 1
 	`
 	var user entity.User
 	err := r.DB.QueryRowContext(ctx, q, id).Scan(
-		&user.ID, &user.Name, &user.Password, &user.Token, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Name, &user.Password, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -103,13 +102,12 @@ func (r *UserRepository) Update(ctx context.Context, user *entity.User) (int64, 
 
 	const q = `
 		UPDATE users
-		SET name = ?, password = ?, token = ?, updated_at = ?
+		SET name = ?, password = ?, updated_at = ?
 		WHERE id = ?
 	`
 	res, err := r.DB.ExecContext(ctx, q,
 		user.Name,
 		user.Password,
-		user.Token,
 		user.UpdatedAt,
 		user.ID,
 	)
