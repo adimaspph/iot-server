@@ -25,6 +25,7 @@ func NewTokenUtil(secretKey string, redisClient *redis.Client) *TokenUtil {
 func (t TokenUtil) CreateToken(ctx context.Context, auth *model.Auth) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":     auth.ID,
+		"role":   auth.Role,
 		"expire": time.Now().Add(time.Hour * 24 * 30).UnixMilli(),
 	})
 
@@ -65,9 +66,9 @@ func (t TokenUtil) ParseToken(ctx context.Context, jwtToken string) (*model.Auth
 		return nil, echo.ErrUnauthorized
 	}
 
-	id := claims["id"].(string)
 	auth := &model.Auth{
-		ID: id,
+		ID:   claims["id"].(string),
+		Role: claims["role"].(string),
 	}
 	return auth, nil
 }
