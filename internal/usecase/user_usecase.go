@@ -128,7 +128,7 @@ func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*
 	}
 
 	// Create JWT (stateless) and store it to redis cache
-	token, err := u.TokenUtil.CreateToken(ctx, &model.Auth{ID: user.ID})
+	token, err := u.TokenUtil.CreateToken(ctx, &model.Auth{ID: user.ID, Role: user.Role})
 	if err != nil {
 		u.Log.WithError(err).Error("failed to create token")
 		return nil, echo.ErrInternalServerError
