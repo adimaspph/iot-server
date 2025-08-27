@@ -52,8 +52,8 @@ func GetUser(c echo.Context) (*model.Auth, bool) {
 	return a, ok
 }
 
-func RequireRoles(allowed ...entity.UserRole) echo.MiddlewareFunc {
-	allow := make(map[entity.UserRole]bool, len(allowed))
+func RequireRoles(allowed ...entity.Role) echo.MiddlewareFunc {
+	allow := make(map[entity.Role]bool, len(allowed))
 	for _, r := range allowed {
 		allow[r] = true
 	}
@@ -64,7 +64,7 @@ func RequireRoles(allowed ...entity.UserRole) echo.MiddlewareFunc {
 			if !ok {
 				return echo.ErrUnauthorized
 			}
-			if !allow[entity.UserRole(auth.Role)] {
+			if !allow[entity.Role(auth.Role)] {
 				return echo.ErrForbidden
 			}
 			return next(c)

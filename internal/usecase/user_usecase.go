@@ -49,7 +49,7 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 	}
 
 	// Validate role
-	role := entity.UserRole(request.Role)
+	role := entity.Role(request.Role)
 	if role != entity.RoleAdmin && role != entity.RoleUser {
 		u.Log.Error("role is invalid")
 		return nil, echo.ErrBadRequest

@@ -10,9 +10,9 @@ type User struct {
 	UpdatedAt int64
 }
 
-type UserRole string
+type Role string
 
 const (
-	RoleAdmin UserRole = "admin"
-	RoleUser  UserRole = "user"
+	RoleAdmin Role = "admin"
+	RoleUser  Role = "user"
 )
