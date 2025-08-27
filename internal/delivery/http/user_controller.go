@@ -1,6 +1,7 @@
 package http
 
 import (
+	"iot-server/internal/delivery/http/middleware"
 	"iot-server/internal/model"
 	"iot-server/internal/usecase"
 	"net/http"
@@ -58,15 +59,12 @@ func (c *UserController) Login(ctx echo.Context) error {
 }
 
 func (c *UserController) Logout(ctx echo.Context) error {
-	var request model.LogoutUserRequest
-
-	err := ctx.Bind(&request)
-	if err != nil {
-		c.Log.WithError(err).Error("failed to bind request")
-		return err
+	// Get user from context
+	auth, ok := middleware.GetUser(ctx)
+	if !ok {
+		return echo.ErrInternalServerError
 	}
-
-	_, err = c.UseCase.Logout(ctx.Request().Context(), &request)
+	_, err := c.UseCase.Logout(ctx.Request().Context(), auth)
 	if err != nil {
 		c.Log.WithError(err).Error("failed to logout")
 		return err
