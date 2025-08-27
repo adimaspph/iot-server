@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"iot-server/internal/delivery/http"
+	"iot-server/internal/delivery/http/middleware"
 	"iot-server/internal/delivery/http/route"
 	"iot-server/internal/delivery/messaging"
 	"iot-server/internal/repository"
@@ -49,10 +50,14 @@ func Bootstrap(config *BootstrapConfig) {
 	sensorController := http.NewSensorController(sensorUseCase, config.Log)
 	userController := http.NewUserController(userUsecase, config.Log)
 
+	// setup middleware
+	authMiddleware := middleware.NewAuth(userUsecase, tokenUtil)
+
 	routeConfig := route.RouteConfig{
 		App:              config.App,
 		SensorController: sensorController,
 		UserController:   userController,
+		AuthMiddleware:   authMiddleware,
 	}
 	routeConfig.Setup()
 }
