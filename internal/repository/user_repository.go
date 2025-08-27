@@ -35,13 +35,14 @@ func (r *UserRepository) Create(ctx context.Context, u *entity.User) error {
 	}
 
 	const q = `
-		INSERT INTO users (id, name, password, created_at, updated_at)
+		INSERT INTO users (id, name, password, role, created_at, updated_at)
 		VALUES (?, ?, ?, ?, ?)
 	`
 	_, err := r.DB.ExecContext(ctx, q,
 		u.ID,
 		u.Name,
 		u.Password,
+		u.Role,
 		u.CreatedAt,
 		u.UpdatedAt,
 	)
@@ -54,14 +55,14 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*entity.User,
 	defer cancel()
 
 	const q = `
-		SELECT id, name, password, created_at, updated_at
+		SELECT id, name, password, role, created_at, updated_at
 		FROM users
 		WHERE id = ?
 		LIMIT 1
 	`
 	var user entity.User
 	err := r.DB.QueryRowContext(ctx, q, id).Scan(
-		&user.ID, &user.Name, &user.Password, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Name, &user.Password, &user.Role, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
