@@ -4,12 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"iot-server/internal/entity"
 	"iot-server/internal/model"
 	"iot-server/internal/model/converter"
 	"iot-server/internal/repository"
 	"iot-server/internal/util"
+	"net/http"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -51,14 +51,14 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 	// Validate role
 	role := entity.Role(request.Role)
 	if role != entity.RoleAdmin && role != entity.RoleUser {
-		u.Log.Error("role is invalid")
-		return nil, echo.ErrBadRequest
+		u.Log.Error("invalid role")
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "invalid role")
 	}
 
 	// Check existence
 	if _, err := u.Repository.FindByID(ctx, request.ID); err == nil {
 		u.Log.Warn("user id already exists")
-		return nil, echo.ErrConflict
+		return nil, echo.NewHTTPError(http.StatusConflict, "user id already exists")
 	} else if !errors.Is(err, sql.ErrNoRows) {
 		// user not found
 		u.Log.WithError(err).Error("failed to find user by id")
@@ -109,14 +109,14 @@ func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserReq
 func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*model.UserResponse, error) {
 	if err := u.Validate.Struct(req); err != nil {
 		u.Log.WithError(err).Warn("failed to validate request")
-		return nil, fmt.Errorf("%w: %v", echo.ErrBadRequest, err)
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "failed to validate request")
 	}
 
 	user, err := u.Repository.FindByID(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			u.Log.WithError(err).Warn("user not found")
-			return nil, fmt.Errorf("%w: %v", echo.ErrUnauthorized, errors.New("user not found"))
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, "wrong id")
 		}
 		u.Log.WithError(err).Error("failed to find user by id")
 		return nil, echo.ErrInternalServerError
@@ -124,7 +124,7 @@ func (u *UserUsecase) Login(ctx context.Context, req *model.LoginUserRequest) (*
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		u.Log.WithError(err).Warn("wrong password")
-		return nil, fmt.Errorf("%w: %v", echo.ErrUnauthorized, errors.New("wrong password"))
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, "wrong password")
 	}
 
 	// Create JWT (stateless) and store it to redis cache
