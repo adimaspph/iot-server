@@ -7,6 +7,7 @@ import (
 	"iot-server/internal/delivery/messaging"
 	"iot-server/internal/repository"
 	"iot-server/internal/usecase"
+	"iot-server/internal/util"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-playground/validator/v10"
@@ -30,9 +31,14 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup repository
 	sensorRepository := repository.NewSensorRepository(config.DB, config.Log)
 	sensorRecordRepository := repository.NewSensorRecordRepository(config.Log)
+	userRepository := repository.NewUserRepository(config.DB, config.Log)
+
+	redisClient := config.Redis
+	tokenUtil := util.NewTokenUtil(config.Config.GetString("AUTH_SECRET"), redisClient)
 
 	// setup use cases
 	sensorUseCase := usecase.NewSensorUsecase(config.DB, config.Log, config.Validate, sensorRepository, sensorRecordRepository)
+	userUsecase := usecase.NewUserUsecase(config.DB, config.Log, config.Validate, userRepository, tokenUtil)
 
 	// setup MQTT broker
 	sensorConsumer := messaging.NewSensorConsumer(sensorUseCase, config.Log)
@@ -41,10 +47,12 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup controller
 	sensorController := http.NewSensorController(sensorUseCase, config.Log)
+	userController := http.NewUserController(userUsecase, config.Log)
 
 	routeConfig := route.RouteConfig{
 		App:              config.App,
 		SensorController: sensorController,
+		UserController:   userController,
 	}
 	routeConfig.Setup()
 }
