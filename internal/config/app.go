@@ -1,14 +1,18 @@
 package config
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
 	"iot-server/internal/delivery/http"
 	"iot-server/internal/delivery/http/middleware"
 	"iot-server/internal/delivery/http/route"
 	"iot-server/internal/delivery/messaging"
+	"iot-server/internal/entity"
 	"iot-server/internal/repository"
 	"iot-server/internal/usecase"
 	"iot-server/internal/util"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/go-playground/validator/v10"
@@ -16,6 +20,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type BootstrapConfig struct {
@@ -60,4 +65,36 @@ func Bootstrap(config *BootstrapConfig) {
 		AuthMiddleware:   authMiddleware,
 	}
 	routeConfig.Setup()
+
+	// Seed admin user
+	ctx := context.Background()
+	if err := seedAdmin(ctx, config); err != nil {
+		config.Log.WithError(err).Fatalf("failed to seedAdmin")
+	}
+
+}
+
+func seedAdmin(ctx context.Context, config *BootstrapConfig) error {
+	adminID := config.Config.GetString("ADMIN_ID")
+	adminName := config.Config.GetString("ADMIN_NAME")
+	adminPass := config.Config.GetString("ADMIN_PASSWORD")
+
+	if adminPass == "" {
+		return fmt.Errorf("ADMIN_PASSWORD is required to seed admin")
+	}
+
+	// Hash password
+	hash, err := bcrypt.GenerateFromPassword([]byte(adminPass), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	now := time.Now().UnixMilli()
+
+	const q = `
+		INSERT IGNORE INTO users (id, name, password, role, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?)
+	`
+	_, err = config.DB.ExecContext(ctx, q, adminID, adminName, string(hash), entity.RoleAdmin, now, now)
+	return err
 }
