@@ -49,26 +49,26 @@ func (r *UserRepository) Create(ctx context.Context, u *entity.User) error {
 }
 
 // FindByToken returns a user by Token
-func (r *UserRepository) FindByToken(ctx context.Context, token string) (*entity.User, error) {
-	ctx, cancel := ctxWithTimeout(ctx)
-	defer cancel()
-
-	const q = `
-		SELECT id, name, password, token, created_at, updated_at
-		FROM users
-		WHERE token = ?
-		LIMIT 1
-	`
-
-	var user entity.User
-	row := r.DB.QueryRowContext(ctx, q, token)
-
-	err := row.Scan(&user.ID, &user.Name, &user.Password, &user.Token, &user.CreatedAt, &user.UpdatedAt)
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
+//func (r *UserRepository) FindByToken(ctx context.Context, token string) (*entity.User, error) {
+//	ctx, cancel := ctxWithTimeout(ctx)
+//	defer cancel()
+//
+//	const q = `
+//		SELECT id, name, password, created_at, updated_at
+//		FROM users
+//		WHERE token = ?
+//		LIMIT 1
+//	`
+//
+//	var user entity.User
+//	row := r.DB.QueryRowContext(ctx, q, token)
+//
+//	err := row.Scan(&user.ID, &user.Name, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return &user, nil
+//}
 
 // FindByID returns a user by ID
 func (r *UserRepository) FindByID(ctx context.Context, id string) (*entity.User, error) {
