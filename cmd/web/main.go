@@ -21,12 +21,6 @@ func main() {
 	mqttClient := config.NewMqtt(viperConfig, log)
 	redisClient := config.NewRedis(viperConfig, log)
 
-	// Connect MQTT
-	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-		log.Fatal(token.Error())
-	}
-	log.Info("MQTT connected")
-
 	// Start Echo server in goroutine
 	port := viperConfig.GetInt("APP_PORT")
 	serverAddr := fmt.Sprintf(":%d", port)
