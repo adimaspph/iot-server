@@ -41,25 +41,6 @@ func NewUserUsecase(
 	}
 }
 
-//func (u *UserUsecase) Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error) {
-//	if err := u.Validate.Struct(request); err != nil {
-//		u.Log.WithError(err).Warn("failed to validate request")
-//		return nil, fmt.Errorf("%w: %v", echo.ErrBadRequest, err)
-//	}
-//
-//	user, err := u.Repository.FindByToken(ctx, request.Token)
-//	if err != nil {
-//		if errors.Is(err, sql.ErrNoRows) {
-//			u.Log.WithError(err).Warn("token doesn't exist")
-//			return nil, echo.ErrNotFound
-//		}
-//		u.Log.WithError(err).Error("failed to find user by token")
-//		return nil, echo.ErrInternalServerError
-//	}
-//
-//	return &model.Auth{ID: user.ID}, nil
-//}
-
 func (u *UserUsecase) Create(ctx context.Context, request *model.RegisterUserRequest) (*model.UserResponse, error) {
 	if err := u.Validate.Struct(request); err != nil {
 		u.Log.WithError(err).Error("failed to validate request")
