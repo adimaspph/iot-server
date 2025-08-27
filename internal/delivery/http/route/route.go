@@ -9,15 +9,22 @@ import (
 type RouteConfig struct {
 	App              *echo.Echo
 	SensorController *http.SensorController
+	UserController   *http.UserController
+	AuthMiddleware   echo.MiddlewareFunc
 }
 
 func (c *RouteConfig) Setup() {
+	c.SetupGuestRoute()
 	c.SetupAuthRoute()
 }
 
-func (c *RouteConfig) SetupAuthRoute() {
+func (c *RouteConfig) SetupGuestRoute() {
+	c.App.POST("/api/users", c.UserController.Register)
+	c.App.POST("/api/users/login", c.UserController.Login)
+}
 
-	v1 := c.App.Group("/api/v1")
+func (c *RouteConfig) SetupAuthRoute() {
+	v1 := c.App.Group("/api/v1", c.AuthMiddleware)
 
 	sensor := v1.Group("/sensor")
 	sensor.POST("/create", c.SensorController.CreateSensor)
@@ -33,4 +40,8 @@ func (c *RouteConfig) SetupAuthRoute() {
 	sensor.PATCH("/update/by-id", c.SensorController.UpdateByCombinedId)
 	sensor.PATCH("/update/by-time-range", c.SensorController.UpdateByTimeRange)
 	sensor.PATCH("/update/by-id-time-range", c.SensorController.UpdateByIdAndTimeRange)
+
+	// user
+	user := c.App.Group("/api/users", c.AuthMiddleware)
+	user.POST("/logout", c.UserController.Logout)
 }
