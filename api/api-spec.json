@@ -3,7 +3,7 @@
   "info": {
     "title": "IOT Server API",
     "version": "1.0.0",
-    "description": "REST API for ingesting and querying IoT sensor data.\n- Authentication: Bearer JWT for `/api/v1/**` and protected user ops.\n- MQTT ingestion flows into the same persistence layer; not exposed here."
+    "description": "REST API for querying IoT sensor data.\n- Authentication: Bearer JWT for `/api/v1/**` and User operation except login."
   },
   "servers": [
     {
@@ -87,7 +87,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Create Sensor Record"
       }
     },
     "/api/v1/sensor/delete/by-id": {
@@ -135,7 +136,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Delete Records by ID Combination"
       }
     },
     "/api/v1/sensor/delete/by-time-range": {
@@ -185,7 +187,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Delete Records by Time Range"
       }
     },
     "/api/v1/sensor/delete/by-id-time-range": {
@@ -251,7 +254,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Delete Records by ID and Time Range"
       }
     },
     "/api/v1/sensor/update/by-id": {
@@ -296,7 +300,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Update Records by ID Combination"
       }
     },
     "/api/v1/sensor/update/by-time-range": {
@@ -341,7 +346,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Update Records by Time Range"
       }
     },
     "/api/v1/sensor/update/by-id-time-range": {
@@ -388,7 +394,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Update Records by ID and Time Range"
       }
     },
     "/api/v1/sensor/search/by-id": {
@@ -449,7 +456,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Search Records by ID Combination"
       }
     },
     "/api/v1/sensor/search/by-time-range": {
@@ -512,7 +520,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Search Records by Time Range"
       }
     },
     "/api/v1/sensor/search/by-id-time-range": {
@@ -591,7 +600,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Search Records by ID and Time Range"
       }
     },
     "/api/users": {
@@ -674,7 +684,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Register User"
       }
     },
     "/api/users/login": {
@@ -756,7 +767,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Login User"
       }
     },
     "/api/users/logout": {
@@ -824,7 +836,8 @@
               }
             }
           }
-        }
+        },
+        "summary": "Logout User"
       }
     }
   },
