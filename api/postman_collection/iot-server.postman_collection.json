@@ -1,0 +1,1668 @@
+{
+	"info": {
+		"_postman_id": "d4426aa6-c3c4-445f-a3a2-1ad3ff9782cc",
+		"name": "iot-server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18297536"
+	},
+	"item": [
+		{
+			"name": "Sensor",
+			"item": [
+				{
+					"name": "Admin Role",
+					"item": [
+						{
+							"name": "Create Sensor Record",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id1\": \"SENSOR-6\",\n    \"id2\": 6,\n    \"sensor_type\": \"temperature\",\n    \"sensor_value\": {{sensor_value}},\n    \"timestamp\": \"{{time}}\"\n}"
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/create",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"create"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Create Sensor Record Example",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id1\": \"SENSOR-6\",\n    \"id2\": 6,\n    \"sensor_type\": \"temperature\",\n    \"sensor_value\": {{sensor_value}},\n    \"timestamp\": \"{{time}}\"\n}"
+										},
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/create",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"create"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 28 Aug 2025 00:42:57 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "216"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": {\n        \"id1\": \"SENSOR-6\",\n        \"id2\": 6,\n        \"sensor_type\": \"temperature\",\n        \"sensor_records\": [\n            {\n                \"sensor_value\": 73.26,\n                \"timestamp\": \"2025-08-28T00:42:57.922Z\"\n            }\n        ]\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete Sensor Record by ID Combination",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/delete/by-id?id1=SENSOR-3&id2=3",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"delete",
+										"by-id"
+									],
+									"query": [
+										{
+											"key": "id1",
+											"value": "SENSOR-3"
+										},
+										{
+											"key": "id2",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Delete Sensor Record by ID Combination",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/delete/by-id?id1=SENSOR-3&id2=3",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"delete",
+												"by-id"
+											],
+											"query": [
+												{
+													"key": "id1",
+													"value": "SENSOR-3"
+												},
+												{
+													"key": "id2",
+													"value": "3"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 27 Aug 2025 20:27:05 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "28"
+										}
+									],
+									"cookie": [
+										{
+											"expires": "Invalid Date",
+											"domain": "",
+											"path": ""
+										}
+									],
+									"body": "{\n    \"data\": {\n        \"deleted\": 5\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete Sensor Record by Time Range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/delete/by-time-range?start=2025-08-25T20:53:03.917000Z&end=2025-08-25T20:53:15.089000Z",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"delete",
+										"by-time-range"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "2025-08-25T20:53:03.917000Z"
+										},
+										{
+											"key": "end",
+											"value": "2025-08-25T20:53:15.089000Z"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Delete Sensor Record by Time Range Example",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/delete/by-time-range?start=2025-08-25T20:53:03.917000Z&end=2025-08-25T20:53:15.089000Z",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"delete",
+												"by-time-range"
+											],
+											"query": [
+												{
+													"key": "start",
+													"value": "2025-08-25T20:53:03.917000Z"
+												},
+												{
+													"key": "end",
+													"value": "2025-08-25T20:53:15.089000Z"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 25 Aug 2025 20:54:27 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "37"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": {\n        \"deleted\": 5\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete Sensor Record by Id & Time Range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/delete/by-id-time-range?start=2025-08-25T21:22:21.000000Z&end=2025-08-25T21:23:21.550000Z&id1=SENSOR-5&id2=5",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"delete",
+										"by-id-time-range"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "2025-08-25T21:22:21.000000Z"
+										},
+										{
+											"key": "end",
+											"value": "2025-08-25T21:23:21.550000Z"
+										},
+										{
+											"key": "id1",
+											"value": "SENSOR-5"
+										},
+										{
+											"key": "id2",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Delete Sensor Record by Id & Time Range Example",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/delete/by-id-time-range?start=2025-08-25T21:22:21.000000Z&end=2025-08-25T21:23:21.550000Z&id1=SENSOR-5&id2=5",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"delete",
+												"by-id-time-range"
+											],
+											"query": [
+												{
+													"key": "start",
+													"value": "2025-08-25T21:22:21.000000Z"
+												},
+												{
+													"key": "end",
+													"value": "2025-08-25T21:23:21.550000Z"
+												},
+												{
+													"key": "id1",
+													"value": "SENSOR-5"
+												},
+												{
+													"key": "id2",
+													"value": "5"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 27 Aug 2025 21:08:25 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "28"
+										}
+									],
+									"cookie": [
+										{
+											"expires": "Invalid Date",
+											"domain": "",
+											"path": ""
+										}
+									],
+									"body": "{\n    \"data\": {\n        \"deleted\": 5\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update Sensor Record by ID Combination Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id1\": \"SENSOR-3\",\r\n    \"id2\": 3,\r\n    \"sensor_value\": 99.99\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/update/by-id",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"update",
+										"by-id"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get Sensor Record by ID Combination Copy",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id1\": \"SENSOR-3\",\r\n    \"id2\": 3,\r\n    \"sensor_value\": 99.99\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/update/by-id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"update",
+												"by-id"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 27 Aug 2025 23:20:20 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "28"
+										}
+									],
+									"cookie": [
+										{
+											"expires": "Invalid Date",
+											"domain": "",
+											"path": ""
+										}
+									],
+									"body": "{\n    \"data\": {\n        \"updated\": 3\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update Sensor Record by Time Range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"start\": \"2025-08-26T07:55:43.36800Z\",\r\n    \"end\": \"2025-08-26T07:51:43.368000Z\",\r\n    \"sensor_value\": 99.99\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/update/by-time-range",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"update",
+										"by-time-range"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get Sensor Record by ID Combination Copy 2",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"start\": \"2025-08-26T07:55:43.36800Z\",\r\n    \"end\": \"2025-08-26T07:51:43.368000Z\",\r\n    \"sensor_value\": 99.99\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/update/by-time-range",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"update",
+												"by-time-range"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 26 Aug 2025 08:33:45 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "96"
+										}
+									],
+									"cookie": [
+										{
+											"expires": "Invalid Date",
+											"domain": "",
+											"path": ""
+										}
+									],
+									"body": "{\n    \"data\": {\n        \"updated\": 3\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update Sensor Record by Id and Time Range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id1\": \"SENSOR-5\",\r\n    \"id2\": 5,\r\n    \"start\": \"2025-08-26T08:34:09.077000Z\",\r\n    \"end\": \"2025-08-26T08:37:09.077000Z\",\r\n    \"sensor_value\": 37.08\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/update/by-id-time-range",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"update",
+										"by-id-time-range"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Update Sensor Record by Time Range Example",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id1\": \"SENSOR-5\",\r\n    \"id2\": 5,\r\n    \"start\": \"2025-08-26T08:34:09.077000Z\",\r\n    \"end\": \"2025-08-26T08:37:09.077000Z\",\r\n    \"sensor_value\": 37.08\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/update/by-id-time-range",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"update",
+												"by-id-time-range"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 26 Aug 2025 08:38:25 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "37"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": {\n        \"updated\": 3\n    }\n}"
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "User Role",
+					"item": [
+						{
+							"name": "Get Sensor Record by ID Combination",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/search/by-id?id1=SENSOR-1&id2=1&page=1&pageSize=10",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"search",
+										"by-id"
+									],
+									"query": [
+										{
+											"key": "id1",
+											"value": "SENSOR-1"
+										},
+										{
+											"key": "id2",
+											"value": "1"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get Sensor Record by ID Example",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/search/by-id?id1=SENSOR-1&id2=1&page=1&pageSize=10",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"search",
+												"by-id"
+											],
+											"query": [
+												{
+													"key": "id1",
+													"value": "SENSOR-1"
+												},
+												{
+													"key": "id2",
+													"value": "1"
+												},
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 28 Aug 2025 02:40:00 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1102"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": {\n        \"id1\": \"SENSOR-1\",\n        \"id2\": 1,\n        \"sensor_type\": \"temperature\",\n        \"sensor_records\": [\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:35Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:37Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:39Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:41Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:43Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:45Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:47Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:49Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:51Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:43:53Z\"\n            }\n        ]\n    },\n    \"paging\": {\n        \"page\": 1,\n        \"size\": 10,\n        \"total_item\": 86,\n        \"total_page\": 9\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Sensor Record by Time Range",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/search/by-time-range?start=2025-08-28T00:45:12.000000Z&end=2025-08-28T00:46:12.000000Z&page=1&pageSize=10",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"search",
+										"by-time-range"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "2025-08-28T00:45:12.000000Z"
+										},
+										{
+											"key": "end",
+											"value": "2025-08-28T00:46:12.000000Z"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get Sensor Record by Time Range Example",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/search/by-time-range?start=2025-08-28T00:45:12.000000Z&end=2025-08-28T00:46:12.000000Z&page=1&pageSize=10",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"search",
+												"by-time-range"
+											],
+											"query": [
+												{
+													"key": "start",
+													"value": "2025-08-28T00:45:12.000000Z"
+												},
+												{
+													"key": "end",
+													"value": "2025-08-28T00:46:12.000000Z"
+												},
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 28 Aug 2025 02:41:06 GMT"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": [\n        {\n            \"id1\": \"SENSOR-345\",\n            \"id2\": 345,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-469\",\n            \"id2\": 469,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-734\",\n            \"id2\": 734,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-427\",\n            \"id2\": 427,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-481\",\n            \"id2\": 481,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-500\",\n            \"id2\": 500,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-316\",\n            \"id2\": 316,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-447\",\n            \"id2\": 447,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-468\",\n            \"id2\": 468,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        },\n        {\n            \"id1\": \"SENSOR-483\",\n            \"id2\": 483,\n            \"sensor_type\": \"temperature\",\n            \"sensor_records\": [\n                {\n                    \"sensor_value\": 10,\n                    \"timestamp\": \"2025-08-28T00:45:12Z\"\n                }\n            ]\n        }\n    ],\n    \"paging\": {\n        \"page\": 1,\n        \"size\": 10,\n        \"total_item\": 14500,\n        \"total_page\": 1450\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Sensor Record by Id & Time Range Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// 1. Generate current timestamp\r",
+											"let time = new Date().toISOString()\r",
+											"\r",
+											"// Store timestamp in variables\r",
+											"pm.variables.set(\"time\", time);\r",
+											"\r",
+											"console.log(time)\r",
+											"\r",
+											"// 2. Generate random sensor value between 0 and 100 with 1 or 2 decimals\r",
+											"let randomValue = (Math.random() * 100).toFixed(2); // 2 decimal places\r",
+											"pm.variables.set(\"sensor_value\", randomValue);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{baseURL}}/api/v1/sensor/search/by-id-time-range?start=2025-08-28T00:45:12.000000Z&end=2025-08-28T00:46:12.000000Z&id1=SENSOR-5&id2=5&page=1&pageSize=10",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"sensor",
+										"search",
+										"by-id-time-range"
+									],
+									"query": [
+										{
+											"key": "start",
+											"value": "2025-08-28T00:45:12.000000Z"
+										},
+										{
+											"key": "end",
+											"value": "2025-08-28T00:46:12.000000Z"
+										},
+										{
+											"key": "id1",
+											"value": "SENSOR-5"
+										},
+										{
+											"key": "id2",
+											"value": "5"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get Sensor Record by Id & Time Range Example",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/api/v1/sensor/search/by-id-time-range?start=2025-08-28T00:45:12.000000Z&end=2025-08-28T00:46:12.000000Z&id1=SENSOR-5&id2=5&page=1&pageSize=10",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"sensor",
+												"search",
+												"by-id-time-range"
+											],
+											"query": [
+												{
+													"key": "start",
+													"value": "2025-08-28T00:45:12.000000Z"
+												},
+												{
+													"key": "end",
+													"value": "2025-08-28T00:46:12.000000Z"
+												},
+												{
+													"key": "id1",
+													"value": "SENSOR-5"
+												},
+												{
+													"key": "id2",
+													"value": "5"
+												},
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "pageSize",
+													"value": "10"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Thu, 28 Aug 2025 02:41:49 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1102"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": {\n        \"id1\": \"SENSOR-5\",\n        \"id2\": 5,\n        \"sensor_type\": \"temperature\",\n        \"sensor_records\": [\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:12Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:14Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:16Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:18Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:20Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:36Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:38Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:40Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:42Z\"\n            },\n            {\n                \"sensor_value\": 10,\n                \"timestamp\": \"2025-08-28T00:45:44Z\"\n            }\n        ]\n    },\n    \"paging\": {\n        \"page\": 1,\n        \"size\": 10,\n        \"total_item\": 24,\n        \"total_page\": 3\n    }\n}"
+								}
+							]
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Admin Role",
+					"item": [
+						{
+							"name": "Register User",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"user1\",\r\n    \"password\": \"user1password\",\r\n    \"name\": \"User Test 1\",\r\n    \"role\": \"user\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/users",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Register Example",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"user1\",\r\n    \"password\": \"user1password\",\r\n    \"name\": \"User Test 1\",\r\n    \"role\": \"user\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/api/users",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"api",
+												"users"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": null,
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 27 Aug 2025 23:28:05 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "85"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": {\n        \"id\": \"user1\",\n        \"name\": \"User Test 1\",\n        \"role\": \"user\"\n    }\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"admin\",\r\n    \"password\": \"adminpassword\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/api/users/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login Example",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"admin\",\r\n    \"password\": \"adminpassword\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseURL}}/api/users/login",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Aug 2025 02:37:07 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "256"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": \"admin\",\n        \"name\": \"Administrator\",\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmUiOjE3NTg5NDA2Mjc4MjgsImlkIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.f3o7I12pVQXc95wkylUofMREE9GPdYMWcnp4KB__z0Y\",\n        \"role\": \"admin\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/users/logout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Login Example",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseURL}}/api/users/logout",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Aug 2025 02:39:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "34"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Logout success\"\n}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmUiOjE3NTg5NDA3ODEwMTEsImlkIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.pPMAQXQAXQOyykvmfhLbO4CPDvTsLGw2d1hsSo9WiNM",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": ""
+		}
+	]
+}
