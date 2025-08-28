@@ -147,7 +147,7 @@ The service uses Paho MQTT to subscribe and forward validated messages to the `S
 ```bash  
 go mod download
 cp .env.example .env   # if available
-go run ./cmd/server
+go run ./cmd/web
 ```
   
 ---  
