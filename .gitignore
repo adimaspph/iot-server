@@ -22,3 +22,7 @@ db_data/
 
 # Environment
 .env
+
+# Mosquitto
+/mosquitto/config/password_file
+/mosquitto/data/mosquitto.db

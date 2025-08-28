@@ -1,29 +1,33 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"iot-server/internal/model"
+	"time"
+)
 
-type Repository[T any] struct {
-	DB *gorm.DB
+const defaultQueryTimeout = 5 * time.Second
+
+// helper
+func pageMeta(page, pageSize int, total int64) *model.PageMetadata {
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+	totalPage := (total + int64(pageSize) - 1) / int64(pageSize)
+	return &model.PageMetadata{
+		Page:      page,
+		Size:      pageSize,
+		TotalItem: total,
+		TotalPage: totalPage,
+	}
 }
 
-func (r *Repository[T]) Create(db *gorm.DB, entity *T) error {
-	return db.Create(entity).Error
-}
-
-func (r *Repository[T]) Update(db *gorm.DB, entity *T) error {
-	return db.Save(entity).Error
-}
-
-func (r *Repository[T]) Delete(db *gorm.DB, entity *T) error {
-	return db.Delete(entity).Error
-}
-
-func (r *Repository[T]) CountById(db *gorm.DB, id any) (int64, error) {
-	var total int64
-	err := db.Model(new(T)).Where("id = ?", id).Count(&total).Error
-	return total, err
-}
-
-func (r *Repository[T]) FindById(db *gorm.DB, entity *T, id any) error {
-	return db.Where("id = ?", id).Take(entity).Error
+func ctxWithTimeout(parent context.Context) (context.Context, context.CancelFunc) {
+	if parent == nil {
+		parent = context.Background()
+	}
+	return context.WithTimeout(parent, defaultQueryTimeout)
 }

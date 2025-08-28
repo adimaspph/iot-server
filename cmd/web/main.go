@@ -1,8 +1,15 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
-	"iot-subscriber/internal/config"
+	"iot-server/internal/config"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -11,6 +18,19 @@ func main() {
 	db := config.NewDatabase(viperConfig, log)
 	validate := config.NewValidator(viperConfig)
 	app := config.NewEcho(viperConfig)
+	mqttClient := config.NewMqtt(viperConfig, log)
+	redisClient := config.NewRedis(viperConfig, log)
+
+	// Start Echo server in goroutine
+	port := viperConfig.GetInt("APP_PORT")
+	serverAddr := fmt.Sprintf(":%d", port)
+
+	go func() {
+		log.Infof("Starting server on %s", serverAddr)
+		if err := app.Start(serverAddr); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("Echo server error: %v", err)
+		}
+	}()
 
 	config.Bootstrap(&config.BootstrapConfig{
 		DB:       db,
@@ -18,13 +38,29 @@ func main() {
 		Log:      log,
 		Validate: validate,
 		Config:   viperConfig,
+		Mqtt:     &mqttClient,
+		Redis:    redisClient,
 	})
 
-	port := viperConfig.GetInt("APP_PORT")
+	// Wait for shutdown signal
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	s := <-sigCh
+	log.Infof("Received signal: %s. Shutting down...", s.String())
 
-	log.Infof("Starting server on port %d", port)
-	err := app.Start(fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	// Shutdown Echo then MQTT
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := app.Shutdown(ctx); err != nil {
+		log.Errorf("Echo shutdown error: %v", err)
+	} else {
+		log.Info("HTTP server stopped")
 	}
+
+	// Allow in-flight MQTT work to flush
+	mqttClient.Disconnect(250)
+	log.Info("MQTT disconnected")
+
+	log.Info("Shutdown complete")
 }

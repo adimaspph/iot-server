@@ -1,0 +1,106 @@
+services:
+  api:
+    build: .
+    container_name: iot-server
+    ports:
+      - "${APP_PORT}:8080"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+      mosquitto:
+        condition: service_started
+    networks:
+      - app-network
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+        limits:
+          cpus: "1.0"
+          memory: 1g
+
+  db:
+    image: mysql:9.4.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+        limits:
+          cpus: "1.0"
+          memory: 1g
+
+  redis:
+    image: redis:8-alpine
+    container_name: redis-cache
+    restart: always
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 256M
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "${MQTT_PORT}:1883"
+    environment:
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PASS=${MQTT_PASS}
+    networks:
+      - app-network
+      - external-network
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    entrypoint: >
+      sh -c "
+      if [ ! -f /mosquitto/config/password_file ]; then
+        mosquitto_passwd -b -c /mosquitto/config/password_file $$MQTT_USER $$MQTT_PASS;
+      fi &&
+      exec mosquitto -c /mosquitto/config/mosquitto.conf
+      "
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge
+  external-network:
+    name: "external-network"
+    driver: bridge
