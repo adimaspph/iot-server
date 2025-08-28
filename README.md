@@ -111,7 +111,8 @@ Go to: https://github.com/adimaspph/iot-sensor
 
 ### 2) Clone the repository
 ```bash  
-git clone https://github.com/adimaspph/iot-sensor.gitcd iot-sensor
+git clone https://github.com/adimaspph/iot-sensor.git
+cd iot-sensor
 ```  
   
 ### 2) Run iot-sensor  
