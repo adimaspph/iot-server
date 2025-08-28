@@ -47,7 +47,7 @@ func Bootstrap(config *BootstrapConfig) {
 	rateLimitUtil := util.NewRateLimiterUtil(redisClient, config.Log, maxRequest, duration)
 
 	// setup use cases
-	sensorUseCase := usecase.NewSensorUsecase(config.DB, config.Log, config.Validate, sensorRepository, sensorRecordRepository)
+	sensorUseCase := usecase.NewSensorUsecase(config.DB, config.Log, config.Validate, redisClient, sensorRepository, sensorRecordRepository)
 	userUsecase := usecase.NewUserUsecase(config.DB, config.Log, config.Validate, userRepository, tokenUtil)
 
 	// setup MQTT broker
